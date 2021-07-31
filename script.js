@@ -9,19 +9,34 @@ document.addEventListener('DOMContentLoaded', function () {
     const nav = document.querySelector('nav');
 
     // All types of news stories
-    const storyTypes = ['topstories', 'newstories', 'beststories', 'askstories', 'showstories', 'jobstories'];
+    const storiesTypes = ['topstories', 'newstories', 'beststories', 'askstories', 'showstories', 'jobstories'];
 
     // Add event listener on navbar click
     nav.addEventListener('click', event => {
         // Dispatch event
-        if (storyTypes.includes(event.target.id)) {
-            renderStories(event.target.id);
+        const storiesType = event.target.id;
+        if (storiesTypes.includes(storiesType)) {
+            // Add stories page to the history
+            history.pushState({ storiesType: storiesType }, '', storiesType);
+
+            // Show stories
+            renderStories(storiesType);
         }
     })
 
     // Load top stories by default
     renderStories('topstories');
 });
+
+// Previous page button
+window.onpopstate = event => {
+    // Get previous stories type from history
+    const storiesType = event.state.storiesType;
+    console.log(`Get previous ${storiesType} page`);
+
+    // Render previous page
+    renderStories(storiesType);
+};
 
 // Hacker News API base URL
 baseUrl = 'https://hacker-news.firebaseio.com/v0';
