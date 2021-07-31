@@ -40,6 +40,9 @@ window.onpopstate = event => {
 // Hacker News API base URL
 baseUrl = 'https://hacker-news.firebaseio.com/v0';
 
+// Should be ran after updates to the stories
+let updateStories;
+
 // Renders stories in the #container
 function renderStories(type) {
     // Clear single page
@@ -75,8 +78,7 @@ function renderStories(type) {
                 loadStories(storyIds, n);
             }
 
-            // Load more stories on window scroll
-            window.onscroll = () => {
+            updateStories = () => {
                 // Reach end of document
                 if (window.scrollY + window.innerHeight >= document.body.offsetHeight) {
                     n += 10;
@@ -84,6 +86,8 @@ function renderStories(type) {
                 }
             };
 
+            // Load more stories on window scroll
+            window.onscroll = updateStories;
         })
         // The promise/request is rejected
         .catch(error => {
@@ -117,13 +121,14 @@ function loadStories(storyIds, n) {
 
                     const storyDate = new Date(story.time * 1000);
                     const storyDateFormated = storyDate.toString().split(' ').slice(1, 5).join(' ');
-                    const storyDomain = story.url.match('(.*?://)?(.*?)/');
+                    let storyDomain = story.url.match('(.*?://)?(.*?)/');
                     if (storyDomain !== null) {
                         storyDomain = storyDomain.slice(-1);
                     }
 
                     // Create list item with link to the story
                     const listItem = document.createElement('li');
+                    listItem.className = 'story';
                     const listLink = document.createElement('a');
                     listLink.innerHTML = story.title;
                     listLink.href = story.url;
@@ -133,7 +138,7 @@ function loadStories(storyIds, n) {
                     listDescription.innerHTML = `<mark>${story.score}</mark> points by <b>${story.by}</b> ${storyDateFormated} | <a href="javascript:void(0)" onclick="javascript:renderStoryComments(${story.id})">${story.descendants} comments</a> `.small();
                     const listHide = document.createElement('button');
                     listHide.innerHTML = 'Hide';
-                    listHide.onclick = () => { alert('hide'); };
+                    listHide.onclick = (event) => { hideStory(event); };
 
                     listDescription.append(listHide);
                     listItem.append(listLink);
@@ -168,7 +173,7 @@ async function renderStoryComments(storyId) {
 
         // Additional attributes
         const storyDateFormated = new Date(story.time * 1000).toString().split(' ').slice(1, 5).join(' ');
-        const storyDomain = story.url.match('(.*?://)?(.*?)/');
+        let storyDomain = story.url.match('(.*?://)?(.*?)/');
         if (storyDomain !== null) {
             storyDomain = storyDomain.slice(-1);
         }
@@ -202,4 +207,14 @@ async function renderStoryComments(storyId) {
     } else {
         console.log(`Non 2xx response: ${response.status}`);
     }
+}
+
+function hideStory(event) {
+    const buttonElement = event.target;
+    const storyElement = buttonElement.parentElement.parentElement;
+    storyElement.style.animationPlayState = 'running';
+    storyElement.onanimationend = () => {
+        storyElement.remove();
+        updateStories();
+    };
 }

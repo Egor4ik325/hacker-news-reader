@@ -21,6 +21,34 @@
                 margin-top: 10px;
                 margin-bottom: 10px;
             }
+
+            @keyframes hide {
+                0% {
+                    /* Animation 1 */
+                    left: 0%;
+                    max-height: 100%;
+                    line-height: 100%;
+                }
+
+                100% {
+                    /* Animation 1 */
+                    left: 110%;
+
+                    /* Animation 2 */
+                    height: 100%;
+                    line-height: 100%;
+                }
+            }
+
+            .story {
+                position: relative;
+
+                animation-name: hide;
+                animation-duration: 2s;
+                animation-fill-mode: forwards;
+                animation-play-state: paused;
+            }
+
         </style>
 
         <script src="script.js"></script>
