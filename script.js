@@ -104,6 +104,11 @@ function loadStories(storyIds, n) {
     for (let i = n; i < storyIds.length && i < n + 10; i++) {
         const storyId = storyIds[i];
 
+        // If story is not hidden
+        if (localStorage.getItem(storyId.toString()) === 'hidden') {
+            continue;
+        }
+
         // Asynchronous request part (immidiatly-invoked async function)
         (async () => {
             try {
@@ -129,6 +134,7 @@ function loadStories(storyIds, n) {
                     // Create list item with link to the story
                     const listItem = document.createElement('li');
                     listItem.className = 'story';
+                    listItem.id = story.id;
                     const listLink = document.createElement('a');
                     listLink.innerHTML = story.title;
                     listLink.href = story.url;
@@ -212,6 +218,10 @@ async function renderStoryComments(storyId) {
 function hideStory(event) {
     const buttonElement = event.target;
     const storyElement = buttonElement.parentElement.parentElement;
+
+    // Add hidden story to the storage
+    localStorage.setItem(storyElement.id.toString(), 'hidden');
+
     storyElement.style.animationPlayState = 'running';
     storyElement.onanimationend = () => {
         storyElement.remove();
