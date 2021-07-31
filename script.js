@@ -3,7 +3,6 @@
 // 2. promises (then/catch)
 // 3. async/await (syntactic sugar) + try/catch
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Navigation bar
     const nav = document.querySelector('nav');
@@ -67,59 +66,89 @@ function renderStories(type) {
         })
         // The promise is resolved (fullfilled)
         .then(storyIds => {
-            const n = 10;
+            let n = 0;
+            loadStories(storyIds, n);
 
-            // Iterate and fetch first 10 stories
-            for (let i = 0; i < storyIds.length && i < n; i++) {
-                const storyId = storyIds[i];
-
-                // Asynchronous request part (immidiatly-invoked async function)
-                (async () => {
-                    try {
-                        const response = await fetch(`${baseUrl}/item/${storyId}.json`);
-
-                        // If response is resolved and response status is 2xx
-                        if (response.ok) {
-                            // Parse HTTP response body as JSON
-                            const story = await response.json();
-                            console.log(story);
-                            const storyDate = new Date(story.time * 1000);
-                            const storyDateFormated = storyDate.toString().split(' ').slice(1, 5).join(' ');
-                            const storyDomain = story.url.match('(.*?://)?(.*?)/').slice(-1);
-
-                            // Create list item with link to the story
-                            const listItem = document.createElement('li');
-                            const listLink = document.createElement('a');
-                            listLink.innerHTML = story.title;
-                            listLink.href = story.url;
-                            const listDomain = document.createElement('span');
-                            listDomain.innerHTML = ` (${storyDomain})`;
-                            const listDescription = document.createElement('div');
-                            listDescription.innerHTML = `<mark>${story.score}</mark> points by <b>${story.by}</b> ${storyDateFormated} | <a href="javascript:void(0)" onclick="javascript:renderStoryComments(${story.id})">${story.descendants} comments</a> `.small();
-                            const listHide = document.createElement('button');
-                            listHide.innerHTML = 'Hide';
-                            listHide.onclick = () => { alert('hide'); };
-
-                            listDescription.append(listHide);
-                            listItem.append(listLink);
-                            listItem.append(listDomain);
-                            listItem.append(listDescription);
-                            list.append(listItem);
-                        } else {
-                            // Log response with error 
-                            console.log(`Non OK (2xx) response: ${response.status}`);
-                        }
-                    } catch (error) {
-                        console.log(error);
-                    }
-                })()
+            // Load more stories initialy
+            if (window.scrollY + window.innerHeight >= document.body.offsetHeight) {
+                n += 10;
+                loadStories(storyIds, n);
             }
+
+            // Load more stories on window scroll
+            window.onscroll = () => {
+                // Reach end of document
+                if (window.scrollY + window.innerHeight >= document.body.offsetHeight) {
+                    n += 10;
+                    loadStories(storyIds, n);
+                }
+            };
+
         })
         // The promise/request is rejected
         .catch(error => {
             // Error handling
             console.log(error);
         });
+}
+
+// Load 10 stories starting from n-th
+function loadStories(storyIds, n) {
+    const list = document.querySelector('ol');
+
+    // Iterate 10 stories
+    for (let i = n; i < storyIds.length && i < n + 10; i++) {
+        const storyId = storyIds[i];
+
+        // Asynchronous request part (immidiatly-invoked async function)
+        (async () => {
+            try {
+                const response = await fetch(`${baseUrl}/item/${storyId}.json`);
+
+                // If response is resolved and response status is 2xx
+                if (response.ok) {
+                    // Parse HTTP response body as JSON
+                    let story = await response.json();
+                    console.log(story);
+
+                    if (!story.hasOwnProperty('url')) {
+                        story.url = '';
+                    }
+
+                    const storyDate = new Date(story.time * 1000);
+                    const storyDateFormated = storyDate.toString().split(' ').slice(1, 5).join(' ');
+                    const storyDomain = story.url.match('(.*?://)?(.*?)/');
+                    if (storyDomain !== null) {
+                        storyDomain = storyDomain.slice(-1);
+                    }
+
+                    // Create list item with link to the story
+                    const listItem = document.createElement('li');
+                    const listLink = document.createElement('a');
+                    listLink.innerHTML = story.title;
+                    listLink.href = story.url;
+                    const listDomain = document.createElement('span');
+                    listDomain.innerHTML = ` (${storyDomain})`;
+                    const listDescription = document.createElement('div');
+                    listDescription.innerHTML = `<mark>${story.score}</mark> points by <b>${story.by}</b> ${storyDateFormated} | <a href="javascript:void(0)" onclick="javascript:renderStoryComments(${story.id})">${story.descendants} comments</a> `.small();
+                    const listHide = document.createElement('button');
+                    listHide.innerHTML = 'Hide';
+                    listHide.onclick = () => { alert('hide'); };
+
+                    listDescription.append(listHide);
+                    listItem.append(listLink);
+                    listItem.append(listDomain);
+                    listItem.append(listDescription);
+                    list.append(listItem);
+                } else {
+                    // Log response with error 
+                    console.log(`Non OK (2xx) response: ${response.status}`);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        })()
+    }
 }
 
 // Render story comments
@@ -131,11 +160,19 @@ async function renderStoryComments(storyId) {
     const response = await fetch(`${baseUrl}/item/${storyId}.json`).catch(error => { console.log(error); });
 
     if (response.ok) {
-        const story = await response.json().catch(error => { console.log(error); });
+        let story = await response.json().catch(error => { console.log(error); });
+
+        if (!story.hasOwnProperty('url')) {
+            story.url = '';
+        }
 
         // Additional attributes
         const storyDateFormated = new Date(story.time * 1000).toString().split(' ').slice(1, 5).join(' ');
-        const storyDomain = story.url.match('(.*?://)?(.*?)/').slice(-1);
+        const storyDomain = story.url.match('(.*?://)?(.*?)/');
+        if (storyDomain !== null) {
+            storyDomain = storyDomain.slice(-1);
+        }
+
 
         // Render story
         container.innerHTML += `<a>${story.title}</a><span>${storyDomain}</span>
