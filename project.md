@@ -30,3 +30,4 @@ But my real goal is to try everything from lecture 6:
 3. Infinite window scroll
 4. CSS/JS animation
 5. React.js library
+6. Bootstrap (components/utilities/layout)

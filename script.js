@@ -38,7 +38,7 @@ window.onpopstate = event => {
 };
 
 // Hacker News API base URL
-baseUrl = 'https://hacker-news.firebaseio.com/v0';
+const baseUrl = 'https://hacker-news.firebaseio.com/v0';
 
 // Should be ran after updates to the stories
 let updateStories;
@@ -141,7 +141,7 @@ function loadStories(storyIds, n) {
                     const listDomain = document.createElement('span');
                     listDomain.innerHTML = ` (${storyDomain})`;
                     const listDescription = document.createElement('div');
-                    listDescription.innerHTML = `<mark>${story.score}</mark> points by <b>${story.by}</b> ${storyDateFormated} | <a href="javascript:void(0)" onclick="javascript:renderStoryComments(${story.id})">${story.descendants} comments</a> `.small();
+                    listDescription.innerHTML = `<span class="story-score"><mark>${story.score}</mark> points</span> by <b>${story.by}</b> ${storyDateFormated} | <a href="javascript:void(0)" onclick="javascript:renderStoryComments(${story.id})">${story.descendants} comments</a> `.small();
                     const listHide = document.createElement('button');
                     listHide.innerHTML = 'Hide';
                     listHide.onclick = (event) => { hideStory(event); };

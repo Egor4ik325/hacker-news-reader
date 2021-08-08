@@ -8,6 +8,13 @@
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 
         <!-- Load static content via CDN -->
+
+        <!-- React, ReactDOM, Babel (JSX) -->
+        <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+        <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
 
@@ -48,26 +55,14 @@
                 animation-fill-mode: forwards;
                 animation-play-state: paused;
             }
-
         </style>
 
-        <script src="script.js"></script>
-
+        <!-- React application (HTML + JS) -->
+        <script type="text/babel" src="app.js"></script>
     </head>
     <body>
-
-        <nav>
-            <img src="./favicon-32x32.png" width="32" height="32" alt="Hacker News logo">
-            <a id="topstories" href="javascript:void(0);">Hacker News</a> - 
-            <a id="newstories" href="javascript:void(0);">New</a> - 
-            <a id="beststories" href="javascript:void(0);">Best</a> - 
-            <a id="askstories" href="javascript:void(0);">Ask</a> - 
-            <a id="showstories" href="javascript:void(0);">Show</a> - 
-            <a id="jobstories" href="javascript:void(0);">Job</a>
-        </nav>
-
         <div id="container">
-            <!-- Content of every app page -->
+            <!-- React renders app here -->
         </div>
     </body>
 </html>
